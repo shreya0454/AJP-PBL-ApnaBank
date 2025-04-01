@@ -5,19 +5,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Transactions extends JFrame implements ActionListener
+public class UserDashboard extends JFrame implements ActionListener
 {
+    private static String token = null;
+
     JButton deposit,withdrawl,balenq,exit,pinchange,mini,fastcash;
-    String pin_no;
-    Transactions(String pin)
+    String user;
+    UserDashboard(String token, String uid)
     {
+    	UserDashboard.token = token;
+        if (!UserDAO.verifyToken(token)) {
+            JOptionPane.showMessageDialog(null, "Access Denied: Invalid Token");
+            return;
+        }
        
         setSize(900,900);
-        setTitle("ATM Simulator");
+        setTitle("User Dashboard");
         setLayout(null);
         setLocationRelativeTo(null);
         setUndecorated(true);
-        pin_no=pin;
+        user=uid;
                
        // getContentPane().setBackground(Color.white);
         
@@ -58,7 +65,7 @@ public class Transactions extends JFrame implements ActionListener
         mini.addActionListener(this);
         image.add(mini);
         
-        pinchange= new JButton("Change PIN");
+        pinchange= new JButton("Change Password");
         pinchange.setFont(new Font("arial",Font.BOLD,13));
         pinchange.setBounds(170,485,150,30);
         pinchange.addActionListener(this);
@@ -77,8 +84,6 @@ public class Transactions extends JFrame implements ActionListener
         image.add(exit);
         
         
-        
-        
         setVisible(true);
     }
 
@@ -92,36 +97,36 @@ public class Transactions extends JFrame implements ActionListener
         if(ae.getSource()==deposit)
         {
             setVisible(false);
-            new Deposit(pin_no);
+            new Deposit(token, user);
         }
         else if(ae.getSource()==withdrawl)
         {
             setVisible(false);
-            new Withdrawl(pin_no);
+            new Withdrawl(user);
         }
         else if(ae.getSource()==fastcash)
         {
             setVisible(false);
-            new Fastcash(pin_no);
+            new Fastcash(user);
         }
          else if(ae.getSource()==pinchange)
         {
             setVisible(false);
-            new PIN_change(pin_no);
+            new PIN_change(user);
         }else if(ae.getSource()==balenq)
         {
             setVisible(false);
-            new Balance_enq(pin_no);
+            new Balance_enq(user);
         }
         else if(ae.getSource()==mini)
         {
-            new Mini_Statement(pin_no);
+            new Mini_Statement(user);
         }
         
     }
     
     public static void main(String[] args)
     {
-        new Transactions("");
+        new UserDashboard("", "");
 ;    }
 }

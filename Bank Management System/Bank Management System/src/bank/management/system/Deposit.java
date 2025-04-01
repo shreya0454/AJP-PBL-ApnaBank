@@ -6,19 +6,28 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Date;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Deposit extends JFrame implements ActionListener
 {
+    private static String token = null;
     
     JButton back,deposit;
     JTextField amt;
-    String pin;
-    Deposit(String pin_no)
+    String user;
+    Deposit(String token, String uid)
     {
+    	Deposit.token = token;
+        if (!UserDAO.verifyToken(token)) {
+            JOptionPane.showMessageDialog(null, "Access Denied: Invalid Token");
+            return;
+        }
+        
         setSize(900,900);
         setLayout(null);
         setLocationRelativeTo(null);
-        pin=pin_no; 
+        user=uid; 
         
         ImageIcon i1= new ImageIcon(ClassLoader.getSystemResource("icons/atm.jpg"));
         Image i2= i1.getImage().getScaledInstance(900, 900, Image.SCALE_DEFAULT);
@@ -61,7 +70,11 @@ public class Deposit extends JFrame implements ActionListener
         if(ae.getSource()==deposit)
         {
             String cash=amt.getText();
-            Date tarik= new Date();
+            int amount = Integer.parseInt(cash);
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String tarik = today.format(formatter);
+            
             if(cash.equals(""))
             {
                 JOptionPane.showMessageDialog(null,"Enter the amount you want to deposit");
@@ -72,12 +85,30 @@ public class Deposit extends JFrame implements ActionListener
                 try
                 {
                     Conn cnc= new Conn();
-                    String query="insert into bank values('"+pin+"' ,'"+tarik+"','"+"deposit"+"','"+cash+"')";
+                    
+                    String balance_query = "SELECT balance " +
+                            "FROM User_Balance " +
+                            "WHERE user_id = ?";                    
+                    PreparedStatement balancestmt = cnc.c.prepareStatement(balance_query);
+                    balancestmt.setString(1, user);
+                    ResultSet rs = balancestmt.executeQuery();
+                    rs.next();
+                    int current_balance = rs.getInt("balance");
+                    int new_balance	 = current_balance + amount;
+
+                    
+                    String query="INSERT INTO User_Statement (account_number, updated_balance, date, transaction_type, amount) VALUES (?,?,?,?,?);";
+                    PreparedStatement stmt = cnc.c.prepareStatement(query);
+                    stmt.setString(1, user);
+                    stmt.setInt(2, new_balance);
+                    stmt.setString(3, tarik);
+                    stmt.setString(4, "Deposit");
+                    stmt.setInt(5, amount);
                     cnc.s.executeUpdate(query);
                     JOptionPane.showMessageDialog(null, "Rs"+cash+" Deposited Successfully");
                     
                     setVisible(false);
-                    new Transactions(pin).setVisible(true);
+                    new UserDashboard(token, user).setVisible(true);
                 
                 
                 }
@@ -90,7 +121,7 @@ public class Deposit extends JFrame implements ActionListener
         else if(ae.getSource()==back)
         {
             setVisible(false);
-            new Transactions(pin).setVisible(true);
+            new UserDashboard(token, user).setVisible(true);
         }
 
     }
@@ -98,6 +129,6 @@ public class Deposit extends JFrame implements ActionListener
     
     public static void main(String[] args)
     {
-        new Deposit("");
+        new Deposit("","");
     }
 }

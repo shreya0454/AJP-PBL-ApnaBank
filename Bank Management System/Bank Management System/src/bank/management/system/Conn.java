@@ -17,7 +17,7 @@ public class Conn
         
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            c=DriverManager.getConnection("jdbc:mysql://localhost:3306/bankmangementsystem","root","sa123");
+            c=DriverManager.getConnection("jdbc:mysql://localhost:3306/ApnaBank_DB","root","Yug!namdar04");
             if(c!=null)
             {
                 System.out.println("connected");

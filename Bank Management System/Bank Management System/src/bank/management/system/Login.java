@@ -8,6 +8,8 @@ import java.sql.*;
  
 public class Login extends JFrame implements ActionListener
 {
+    private static String token = null;
+
     JButton log;
     JButton clear;
     JButton signup;
@@ -15,7 +17,7 @@ public class Login extends JFrame implements ActionListener
     JPasswordField pwd;
     Login()
     {
-        setTitle("ATM Login");
+        setTitle("Login");
         setSize(800,500);
         setLayout(null);
         setLocationRelativeTo(null);
@@ -27,20 +29,20 @@ public class Login extends JFrame implements ActionListener
         lbl1.setBounds(70,10,100,100);
         add(lbl1);
         
-        JLabel lbl2= new JLabel("Welcome to ATM");
-        lbl2.setFont((new Font("arial",Font.BOLD,40)));
+        JLabel lbl2= new JLabel("Welcome to ApnaBank");
+        lbl2.setFont((new Font("arial",Font.BOLD,36)));
         lbl2.setBounds(250, 40,400 , 40);
         add(lbl2);
         
-        JLabel card = new JLabel("Card No: ");
-        card.setFont(new Font("Raleway",Font.BOLD, 28));
-        card.setBounds(120,150,1500,40);
-        add(card);
+        JLabel uid = new JLabel("User ID: ");
+        uid.setFont(new Font("Raleway",Font.BOLD, 28));
+        uid.setBounds(120,150,1500,40);
+        add(uid);
         
-        JLabel pin= new JLabel("Pin: ");
-        pin.setFont(new Font("Raleway",Font.BOLD, 28));
-        pin.setBounds(120,220,230,30);
-        add(pin);
+        JLabel pass= new JLabel("Password: ");
+        pass.setFont(new Font("Raleway",Font.BOLD, 28));
+        pass.setBounds(120,220,230,30);
+        add(pass);
         
         txt1= new JTextField();
         txt1.setBounds(300, 150, 230, 30);
@@ -66,7 +68,7 @@ public class Login extends JFrame implements ActionListener
         clear.addActionListener(this);
         add(clear);
         
-        signup= new JButton("Sign Up");
+        signup= new JButton("Open New Account");
         signup.setBounds(300, 350, 230, 30);
         signup.setBackground(Color.black);
         signup.setForeground(Color.white);
@@ -92,35 +94,12 @@ public class Login extends JFrame implements ActionListener
         }
         else if(ae.getSource()==log)
         {
-            Conn cnc= new Conn();
-            String card=txt1.getText();
+            String uid=txt1.getText();
             String pass=String.valueOf(pwd.getPassword());
-            String query="select * from login where Card_Number ='"+card+"' and PIN_Number ='"+pass+"'";
-           
-            try
-            {
-               ResultSet res= cnc.s.executeQuery(query);
-               if(res.next())
-               {
-                   this.dispose();
-                   new Transactions(pass);
-               }
-               else
-               {
-                   JOptionPane.showMessageDialog(null, "Incorrect card number or pin");
-                   
-               }
-               
-                
-            }
-            catch(SQLException e)
-            {
-                System.out.println(e);
-            }
-            catch(Exception e)
-            {
-                System.out.println(e);
-            }
+            token = UserDAO.loginUser(uid, pass);	
+            System.out.println("Successfully signed in!");
+            setVisible(false);
+            new UserDashboard(token, uid);
         }
         
     }

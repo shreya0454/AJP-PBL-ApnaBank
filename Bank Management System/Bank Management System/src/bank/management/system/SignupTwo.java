@@ -8,6 +8,7 @@ import java.util.*;
 import java.sql.*;
 
 
+
 public class SignupTwo extends JFrame implements ActionListener
 {
     Font txtfont= new Font("arial",Font.BOLD, 14);
@@ -41,7 +42,7 @@ public class SignupTwo extends JFrame implements ActionListener
         religion.setFont(new Font("arial",Font.BOLD,18));
         add(religion);
         
-        String multirel[] = {"Hindi","Muslim","Sikh","Christian","Others"};
+        String multirel[] = {"Hindu","Muslim","Sikh","Christian","Others"};
         relgn = new JComboBox(multirel);
         relgn.setBounds(270, 130, 400, 30);
         relgn.setBackground(Color.white);
@@ -211,14 +212,22 @@ public class SignupTwo extends JFrame implements ActionListener
         try
         {
            Conn cnc= new Conn();
-           String query="INSERT INTO signup2(formno, Religion, Category, Income, Education, Occupation, PAN_Number, Aadhar_Number, Senior_Citizen, Existing_Account) VALUES ('" +form + "','" + srel + "', '" + scategory + "', '" + sincome + "', '" + sedu + "', '" + socc + "', '" + span + "', '" + sadhar + "', '" + citi + "', '" + eacc + "');";
-//                if(cnc!=null)
-//                {
-//                    System.out.println("Connected");
-//                }
-                cnc.s.executeUpdate(query);
-                this.dispose();;
-                new SignupThree(form);
+           String query="INSERT INTO User_Documentation(form_no, Religion, Category, Income, Education, Occuption, PAN, Aadhar, SeniorCitizen, Existing_Account) VALUES (?,?,?,?,?,?,?,?,?,?);";
+           PreparedStatement stmt = cnc.c.prepareStatement(query);
+           stmt.setString(1, form);
+           stmt.setString(2, srel);
+           stmt.setString(3, scategory);
+           stmt.setString(4, sincome);
+           stmt.setString(5, sedu);
+           stmt.setString(6, socc);
+           stmt.setString(7, span);
+           stmt.setString(8, sadhar);
+           stmt.setString(9, citi);
+           stmt.setString(10, eacc);
+           System.out.println(query);
+           stmt.executeUpdate();         
+           this.dispose();;
+           new Registration();
            
         }
         catch(SQLException e)

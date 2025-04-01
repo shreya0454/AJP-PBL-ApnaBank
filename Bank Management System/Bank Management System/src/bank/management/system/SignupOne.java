@@ -227,12 +227,21 @@ public class SignupOne extends JFrame implements ActionListener
             else
             {
                 Conn cnc= new Conn();
-                String query="INSERT INTO signup(formno, name, father_name, dob, gender, email, marital_status, address, city, pincode, state) VALUES ('" + formno + "', '" + name + "', '" + fname + "', '" + birth + "', '" + gender + "', '" + email + "', '" + marital + "', '" + address + "', '" + city + "', '" + pin + "', '" + state + "');";
-//                if(cnc!=null)
-//                {
-//                    System.out.println("Connected");
-//                }
-                cnc.s.executeUpdate(query);
+                String query="INSERT INTO User_Personal_Details(form_no, name, Father_name, DOB, gender, email, married_status, address, city, pin_code, state) VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+                PreparedStatement stmt = cnc.c.prepareStatement(query);
+                stmt.setString(1, formno);
+                stmt.setString(2, name);
+                stmt.setString(3, fname);
+                stmt.setString(4, birth);
+                stmt.setString(5, gender);
+                stmt.setString(6, email);
+                stmt.setString(7, marital);
+                stmt.setString(8, address);
+                stmt.setString(9, city);
+                stmt.setString(10, pin);
+                stmt.setString(11, state);
+                System.out.println(query);
+                stmt.executeUpdate();                
                 setVisible(false);
                 new SignupTwo(formno);
             }
