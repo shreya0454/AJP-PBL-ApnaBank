@@ -1,101 +1,88 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package bank.management.system;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.ResultSet;
-
-public class Mini_Statement extends JFrame implements ActionListener
-{
-    JButton back;
+import java.sql.*;
     
-    Mini_Statement(String pin)
-    {
-        setSize(400,600);
-        setTitle("Mini Statment");
+public class Mini_Statement extends JFrame implements ActionListener {
+    JButton back;
+    private static String token = null;
+    String user; // user id
+
+    public Mini_Statement(String token, String uid) {
+        Mini_Statement.token = token;
+        if (!UserDAO.verifyToken(token)) {
+            JOptionPane.showMessageDialog(null, "Access Denied: Invalid Token");
+            return;
+        }
+        user = uid;
+        
+        setSize(450,700);
+        setTitle("Mini Statement");
         setLayout(null);
         setLocationRelativeTo(null);
-        //setUndecorated(true);
+        getContentPane().setBackground(Color.white);
         
-       getContentPane().setBackground(Color.white);
+     // Bank title label
+        JLabel bank = new JLabel("Apna Bank");
+        bank.setFont(new Font("Raleway", Font.BOLD, 17));
+        bank.setBounds(20, 20, 360, 30);  // Top of the frame, full width
+        add(bank);
+
+        // Label to display mini statement details using HTML formatting
+        JLabel statementLabel = new JLabel();
+        statementLabel.setBounds(20, 60, 360, 400);  // Below the bank label with ample space
+        add(statementLabel);
+
+        // Label to display current balance
+        JLabel balanceLabel = new JLabel();
+        balanceLabel.setBounds(20, 470, 360, 30);  // Near the bottom, above the back button if any
+        add(balanceLabel);
+
+        try {
+            Conn cnc = new Conn();
+            // Retrieve mini statement ordered by date descending
+            String query = "SELECT * FROM User_Statement WHERE user_id = ? ORDER BY date DESC";
+            PreparedStatement stmt = cnc.c.prepareStatement(query);
+            stmt.setString(1, user);
+            ResultSet rs = stmt.executeQuery();
+            
+            String miniStatementText = "<html>";
+            int updatedBalance = 0;
+            // Iterate over transactions and build HTML string
+            while (rs.next()) {
+                String date = rs.getString("date");
+                String type = rs.getString("transaction_type");
+                int amount = rs.getInt("amount");
+                updatedBalance = rs.getInt("updated_balance");
+                miniStatementText += date + " &nbsp;&nbsp;" + type 
+                        + " &nbsp;&nbsp; Rs " + amount 
+                        + " &nbsp;&nbsp; Bal: Rs " + updatedBalance + "<br><br>";
+
+            }
+            miniStatementText += "</html>";
+            statementLabel.setText(miniStatementText);
+            balanceLabel.setText("Your Current Balance is Rs " + updatedBalance);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
         
-       
-       
-       JLabel bank= new JLabel("State Bank of India");
-       bank.setFont(new Font("Raleway",Font.BOLD,17));
-       bank.setBounds(120,30,160,20);
-       add(bank);
-       
-       JLabel balance= new JLabel();
-       balance.setBounds(20,400,300,20);
-       add(balance);
-   
-       JLabel card= new JLabel();
-       card.setBounds(20,80,300,20);
-       add(card);
-       
-       JLabel lbl1= new JLabel();
-       lbl1.setBounds(20,140,400,200);
-       add(lbl1);
-       try
-       {
-           Conn cnc= new Conn();
-           ResultSet rs=cnc.s.executeQuery("select * from login where PIN_Number ='"+ pin+"'");
-           while(rs.next())
-           {
-               card.setText("Card Number: "+rs.getString("Card_Number").substring(0,4)+"XXXXXXXX"+rs.getString("Card_Number").substring(12));
-           }
-       }
-       catch(Exception e)
-       {
-           System.out.println(e);
-       }
-       
-       try
-       {
-           Conn cnc= new Conn();
-           int bal=0;
-          ResultSet res= cnc.s.executeQuery("select * from bank where PIN ='"+pin+"'");
-          while(res.next())
-          {
-            lbl1.setText(lbl1.getText()+ "<html>" + res.getString("data")+ "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+res.getString("type")+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+res.getString("amount")+"<br><br><html>" );
-            if(res.getString("type").equals("deposit"))
-                    {
-                        bal+=Integer.parseInt(res.getString("amount"));
-                    } 
-                    else{
-                        bal -=Integer.parseInt(res.getString("amount"));
-                    }
-          }
-          
-          balance.setText("Your Current Balance is Rs "+bal);
-       }
-       catch(Exception ae)
-               {
-                   System.out.println(ae);
-               }
-     
-       
-       
-        
-        
-    
+        back = new JButton("Back");
+        back.setBounds(150, 550, 100, 30);
+        back.addActionListener(this);
+        add(back);
         
         setVisible(true);
     }
-
+    
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
-        
+    public void actionPerformed(ActionEvent e) {
+        setVisible(false);
+        new UserDashboard(token, user).setVisible(true);
     }
     
-    public static void main(String[] args)
-    {
-        new Mini_Statement("");
+    public static void main(String[] args) {
+        new Mini_Statement("", "");
     }
 }

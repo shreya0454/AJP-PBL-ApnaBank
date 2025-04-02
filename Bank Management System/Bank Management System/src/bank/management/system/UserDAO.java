@@ -15,9 +15,7 @@ public class UserDAO {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO Accounts (user_id, password) VALUES (?, ?);");
-            PreparedStatement balancestmt = conn.prepareStatement("INSERT INTO User_Balance (balance, user_id) VALUES (?, ?);");
-            balancestmt.setInt(1, 0);
-            balancestmt.setString(2, username);
+
             stmt.setString(1, username);
             stmt.setString(2, hashedPassword);
             return stmt.executeUpdate() > 0;

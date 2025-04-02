@@ -97,15 +97,23 @@ public class Deposit extends JFrame implements ActionListener
                     int new_balance	 = current_balance + amount;
 
                     
-                    String query="INSERT INTO User_Statement (account_number, updated_balance, date, transaction_type, amount) VALUES (?,?,?,?,?);";
+                    String query="INSERT INTO User_Statement (user_id, updated_balance, date, transaction_type, amount) VALUES (?,?,?,?,?);";
                     PreparedStatement stmt = cnc.c.prepareStatement(query);
                     stmt.setString(1, user);
                     stmt.setInt(2, new_balance);
                     stmt.setString(3, tarik);
                     stmt.setString(4, "Deposit");
                     stmt.setInt(5, amount);
-                    cnc.s.executeUpdate(query);
+                    stmt.executeUpdate();
                     JOptionPane.showMessageDialog(null, "Rs"+cash+" Deposited Successfully");
+                    
+                    
+                    String update_query="UPDATE User_Balance SET balance = ? WHERE user_id = ?;";
+                    PreparedStatement update_stmt = cnc.c.prepareStatement(update_query);
+                    update_stmt.setInt(1, new_balance);
+                    update_stmt.setString(2, user);
+                    update_stmt.executeUpdate();
+                    System.out.println("Balance updated!");
                     
                     setVisible(false);
                     new UserDashboard(token, user).setVisible(true);

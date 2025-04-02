@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Random;
 
@@ -105,6 +106,12 @@ public class Registration extends JFrame implements ActionListener
             else
             {
             	UserDAO.registerUser(user, pass);
+                Conn conn = new Conn();
+
+                PreparedStatement balancestmt = conn.c.prepareStatement("INSERT INTO User_Balance (balance, user_id) VALUES (?, ?);");
+                balancestmt.setInt(1, 0);
+                balancestmt.setString(2, user);
+                balancestmt.executeUpdate();
             	System.out.println("New User Registered!");
             	setVisible(false);
             	new Login();

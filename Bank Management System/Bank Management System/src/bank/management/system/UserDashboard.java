@@ -102,12 +102,12 @@ public class UserDashboard extends JFrame implements ActionListener
         else if(ae.getSource()==withdrawl)
         {
             setVisible(false);
-            new Withdrawl(user);
+            new Withdrawl (token, user);
         }
         else if(ae.getSource()==fastcash)
         {
             setVisible(false);
-            new Fastcash(user);
+            new Fastcash(token, user);
         }
          else if(ae.getSource()==pinchange)
         {
@@ -116,11 +116,11 @@ public class UserDashboard extends JFrame implements ActionListener
         }else if(ae.getSource()==balenq)
         {
             setVisible(false);
-            new Balance_enq(user);
+            new Balance_enq(token, user);
         }
         else if(ae.getSource()==mini)
         {
-            new Mini_Statement(user);
+            new Mini_Statement(token, user);
         }
         
     }
